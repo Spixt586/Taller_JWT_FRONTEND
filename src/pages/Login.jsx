@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { API_BASE_URL } from "../config/apiConfig";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { API_BASE_URL } from "../config/apiConfig";
 
 function Login() {
     const navigate = useNavigate();
     const { login } = useAuth();
+
     const [formulario, setFormulario] = useState({
         username: "",
         password: ""
@@ -21,17 +22,15 @@ function Login() {
         }));
     }
 
-    async function manejarSubmit(event) {
+    async function manejarEnvio(event) {
         event.preventDefault();
         setMessage("");
         setCargando(true);
 
         try {
-            const respuesta = await fetch(`${API_BASE_URL}/auth/login`, {
+            const respuesta = await fetch(`${API_BASE_URL}/login`, {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(formulario)
             });
 
@@ -45,10 +44,7 @@ function Login() {
 
             if (!respuesta.ok) {
                 throw new Error(
-                    datos?.message ||
-                    datos?.error ||
-                    contenido ||
-                    "Usuario o contraseña incorrecta"
+                    datos?.message || datos?.error || contenido || "Usuario o contraseña incorrecta"
                 );
             }
             if (!datos?.token) {
@@ -56,8 +52,6 @@ function Login() {
             }
 
             login(datos.token);
-            localStorage.setItem("username", formulario.username);
-
             navigate("/perfil");
         } catch (error) {
             setMessage(error.message);
@@ -73,14 +67,14 @@ function Login() {
             <span className="login-ring" aria-hidden="true" />
 
             <section className="login-hero">
-                <h1 className="login-hero__titulo">Hola de nuevo</h1>
+                <h1 className="login-hero__titulo">Bienvenido de nuevo</h1>
                 <p className="login-hero__texto">
-                    Entra con tu usuario para ver tu perfil. Tu sesión dura una hora.
+                    Ingresa con tu cuenta para ver tu perfil.
                 </p>
             </section>
 
-            <section className="login-card">
-                <form className="login-card__inner" onSubmit={manejarSubmit} noValidate>
+            <form className="login-card" onSubmit={manejarEnvio}>
+                <div className="login-card__inner">
                     <h2 className="login-card__titulo">Iniciar sesión</h2>
 
                     <div className="login-campo">
@@ -111,21 +105,26 @@ function Login() {
                         <label htmlFor="password">Contraseña</label>
                     </div>
 
-                    <p className="login-mensaje" role="alert" aria-live="polite" key={message}>
-                        {message}
-                    </p>
+                    <p className="login-mensaje" role="alert">{message}</p>
 
                     <button
                         className="login-boton"
                         type="submit"
-                        disabled={cargando || !formulario.username || !formulario.password}
+                        disabled={cargando}
                         aria-busy={cargando}
                     >
-                        {cargando ? <span className="login-spinner" aria-hidden="true" /> : null}
-                        {cargando ? "Entrando…" : "Entrar"}
+                        {cargando && <span className="login-spinner" aria-hidden="true" />}
+                        {cargando ? "Ingresando" : "Iniciar sesión"}
                     </button>
-                </form>
-            </section>
+
+                    <p className="login-pie">
+                        ¿No tienes cuenta?{" "}
+                        <Link className="login-enlace" to="/registrar">
+                            Regístrate
+                        </Link>
+                    </p>
+                </div>
+            </form>
         </main>
     );
 }

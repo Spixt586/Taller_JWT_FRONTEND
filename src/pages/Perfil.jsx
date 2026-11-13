@@ -1,72 +1,86 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { API_BASE_URL } from '../config/apiConfig';
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { API_BASE_URL } from "../config/apiConfig";
 
 function Perfil() {
-	const [datosPerfil, setDatosPerfil] = useState(null);
-	const [error, setError] = useState('');
+    const navigate = useNavigate();
+    const { token, logOut } = useAuth();
 
-	const { token, logOut } = useAuth();
-	const navigate = useNavigate();
+    const [datos, setDatos] = useState(null);
+    const [error, setError] = useState("");
 
-	useEffect(() => {
-		const cargarPerfil = async () => {
-			try{
-				const response = await fetch(`${API_BASE_URL}/auth/perfil`, {
-					headers: {
-						'Authorization': `Bearer ${token}`
-					}
-				});
+    useEffect(() => {
+        async function cargarPerfil() {
+            try {
+                const respuesta = await fetch(`${API_BASE_URL}/perfil`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
 
-				if (!response.ok) {
-					throw new Error('No se pudo cargar Perfil, inicie sesión nuevamente');
-				}
+                if (respuesta.status === 401 || respuesta.status === 403) {
+                    logOut();
+                    navigate("/login", { replace: true });
+                    return;
+                }
+                if (!respuesta.ok) {
+                    throw new Error("No se pudo cargar el perfil");
+                }
 
-				const datos = await response.json();
-				setDatosPerfil(datos);
-			} catch (err) {
-				setError(err.message);
-			}
-		};
-		
-		cargarPerfil();
-	}, [token]);
+                setDatos(await respuesta.json());
+            } catch (err) {
+                setError(err.message);
+            }
+        }
 
-	const manejarLogout = async () => {
-		try{
-			await fetch(`${API_BASE_URL}/auth/logout`, {
-				method: 'POST',
-				headers: {
-					'Authorization': `Bearer ${token}`
-				}
-			});
-		} catch (err) {
-			console.log('Error al intentar revocar el token. ' + err)
-		}
+        cargarPerfil();
+    }, [token]);
 
-		logOut();
-		navigate('/login')
-	}
-	return(
-		<div>
-			<div>
-				<h2>Perfil Usuario</h2>
-				<button onClick={manejarLogout}>Cerrar Sesión</button>
-			</div>
+    async function cerrarSesion() {
+        try {
+            await fetch(`${API_BASE_URL}/logout`, {
+                method: "POST",
+                headers: { Authorization: `Bearer ${token}` }
+            });
+        } catch (err) {
+            console.log("No se pudo invalidar el token en el servidor", err);
+        }
+        logOut();
+        navigate("/login", { replace: true });
+    }
 
-			{error && <p>{error}</p>}
-			
-			{datosPerfil && (
-				<div>
-					<p>{datosPerfil.Mensaje}</p>
-					<p>{datosPerfil.Usuario}</p>
-					<p>{datosPerfil.Rol}</p>
-					<p>{datosPerfil.Estatus}</p>
-				</div>
-			)}
-		</div>
-	)
+    return (
+        <main className="login-page">
+            <span className="login-blob login-blob--uno" aria-hidden="true" />
+            <span className="login-blob login-blob--dos" aria-hidden="true" />
+
+            <section className="login-hero">
+                <h1 className="login-hero__titulo">Tu perfil</h1>
+                <p className="login-hero__texto">
+                    {datos ? datos.Mensaje : "Cargando tus datos..."}
+                </p>
+            </section>
+
+            <div className="login-card">
+                <div className="login-card__inner">
+                    <h2 className="login-card__titulo">Sesión activa</h2>
+
+                    <p className="login-mensaje" role="alert">{error}</p>
+
+                    {datos && (
+                        <>
+                            <p className="login-pie">Usuario: <strong>{datos.Usuario}</strong></p>
+                            <p className="login-pie">Rol: <strong>{datos.rol_detectado}</strong></p>
+                            <p className="login-pie">{datos.status}</p>
+                        </>
+                    )}
+
+                    <button className="login-boton" onClick={cerrarSesion}>
+                        Cerrar sesión
+                    </button>
+                </div>
+            </div>
+        </main>
+    );
 }
 
-export default Perfil
+export default Perfil;
