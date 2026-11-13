@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { API_BASE_URL } from "../config/apiConfig";
 
@@ -74,7 +74,11 @@ function Perfil() {
                         </>
                     )}
 
-                    <button className="login-boton" onClick={cerrarSesion}>
+                    <Link className="login-boton" to="/gestion">
+                        Gestionar películas
+                    </Link>
+
+                    <button className="login-boton login-boton--secundario" onClick={cerrarSesion}>
                         Cerrar sesión
                     </button>
                 </div>

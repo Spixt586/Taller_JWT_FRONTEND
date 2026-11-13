@@ -4,6 +4,7 @@ import Login from './pages/Login';
 import Registrar from './pages/Registrar.jsx';
 import Perfil from './pages/Perfil';
 import ProtectedRoute from './components/ProtectedRoute';
+import GestionItems from './pages/GestionItems.jsx';
 import './App.css';
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
 
         <Route element={<ProtectedRoute />}>
           <Route path='/perfil' element={<Perfil />} />
+          <Route path='/gestion' element={<GestionItems />} />
         </Route>
 
         <Route path='*' element={<Navigate to='/login' replace />} />

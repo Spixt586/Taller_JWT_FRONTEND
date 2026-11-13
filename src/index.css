@@ -582,3 +582,237 @@ code {
   outline-offset: 3px;
   border-radius: 6px;
 }
+
+/* ================= AGREGAR AL FINAL DE index.css ================= */
+/* Gestión de películas: reutiliza las variables y componentes de .login-page */
+
+/* ---------- Botones: variantes ---------- */
+
+/* .login-boton también se usa en <Link>, así que quitamos el subrayado */
+a.login-boton {
+  text-decoration: none;
+}
+
+.login-boton--chico {
+  padding: 0.6rem 1.1rem;
+  font-size: 0.95rem;
+}
+
+.login-boton--secundario {
+  background: rgba(240, 238, 233, 0.1);
+  box-shadow: inset 0 0 0 2px rgba(240, 238, 233, 0.3);
+}
+
+.login-boton--secundario:hover:not(:disabled) {
+  background: rgba(240, 238, 233, 0.18);
+  box-shadow: inset 0 0 0 2px var(--caléndula);
+}
+
+.login-boton--peligro {
+  background: linear-gradient(120deg, #c4264a, var(--coral));
+  box-shadow: 0 10px 24px -8px rgba(255, 77, 109, 0.7);
+}
+
+/* ---------- Página de gestión ---------- */
+
+.login-page.gestion-page {
+  grid-template-columns: minmax(0, 1fr);
+  align-content: start;
+  justify-items: stretch;
+}
+
+.gestion-cabecera {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+.gestion-page .login-hero {
+  justify-self: start;
+  padding-left: 0;
+  text-align: left;
+}
+
+.gestion-page .login-hero__texto {
+  margin-inline: 0;
+}
+
+.gestion-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+/* La tarjeta del formulario ocupa todo el ancho en esta página */
+.login-card.gestion-panel {
+  width: 100%;
+  justify-self: stretch;
+}
+
+.gestion-campos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: 1.35rem;
+}
+
+/* ---------- Campo de archivo ---------- */
+/* La etiqueta va ANTES del input en el DOM para no heredar la etiqueta flotante */
+
+.login-campo--archivo label {
+  position: static;
+  translate: none;
+  scale: 1;
+  display: block;
+  margin-bottom: 0.45rem;
+  font-size: 0.8rem;
+  color: var(--caléndula);
+}
+
+.login-campo--archivo input[type="file"] {
+  padding: 0.7rem 0.8rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.login-campo--archivo input[type="file"]::file-selector-button {
+  margin-right: 0.8rem;
+  padding: 0.4rem 0.9rem;
+  font: inherit;
+  font-weight: 600;
+  color: #fff;
+  cursor: pointer;
+  border: 0;
+  border-radius: 999px;
+  background: linear-gradient(120deg, var(--violeta), var(--coral));
+}
+
+/* ---------- Listado y tarjetas ---------- */
+
+.gestion-lista {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 1.25rem;
+}
+
+.gestion-vacio {
+  text-align: center;
+  color: rgba(240, 238, 233, 0.85);
+}
+
+.gestion-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+  gap: 1.5rem;
+}
+
+.pelicula-card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 24px;
+  border: 2px solid rgba(240, 238, 233, 0.16);
+  background: rgba(27, 11, 46, 0.86);
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
+  box-shadow: 0 24px 48px -24px rgba(27, 11, 46, 0.8);
+  transition:
+    transform 0.3s var(--resorte),
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.pelicula-card:hover {
+  transform: translateY(-6px);
+  border-color: var(--caléndula);
+  box-shadow: 0 30px 56px -20px rgba(255, 77, 109, 0.5);
+}
+
+.pelicula-card__img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+}
+
+.pelicula-card__img--vacia {
+  display: grid;
+  place-items: center;
+  font-weight: 600;
+  color: rgba(240, 238, 233, 0.7);
+  background:
+    radial-gradient(circle at 30% 30%, rgba(37, 229, 176, 0.25), transparent 60%),
+    linear-gradient(160deg, rgba(108, 43, 255, 0.45), rgba(255, 77, 109, 0.35));
+}
+
+.pelicula-card__cuerpo {
+  display: grid;
+  gap: 0.4rem;
+  padding: 1.1rem 1.1rem 1.25rem;
+}
+
+.pelicula-card__titulo {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--nube);
+}
+
+.pelicula-card__genero {
+  font-size: 0.9rem;
+  color: var(--menta);
+}
+
+.pelicula-card__acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.6rem;
+}
+
+.pelicula-card__acciones .login-boton {
+  flex: 1 1 auto;
+}
+
+/* ---------- Modal de edición ---------- */
+
+.gestion-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  padding: 1.25rem;
+  overflow-y: auto;
+  background: rgba(27, 11, 46, 0.7);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  animation: login-aparecer 0.25s ease-out;
+}
+
+.gestion-modal-acciones {
+  display: grid;
+  gap: 0.75rem;
+}
+
+@media (max-width: 899px) {
+  .gestion-cabecera {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .gestion-page .login-hero {
+    text-align: center;
+    justify-self: center;
+  }
+
+  .gestion-page .login-hero__texto {
+    margin-inline: auto;
+  }
+}
