@@ -1,4 +1,3 @@
-
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;800&display=swap");
 
 :root {
@@ -135,10 +134,22 @@ code {
   align-content: center;
   gap: clamp(1.5rem, 4vw, 3rem);
   padding: clamp(1.25rem, 5vw, 4rem);
-  overflow: hidden;
+  padding-inline: max(clamp(1.25rem, 5vw, 4rem), env(safe-area-inset-left), env(safe-area-inset-right));
+  overflow-x: clip; /* recorta sin crear un contenedor de scroll */
   box-sizing: border-box;
   font-family: "Poppins", system-ui, "Segoe UI", sans-serif;
   color: var(--nube);
+  background: var(--coral); /* respaldo; el degradado real está en ::before */
+}
+
+/* Fondo fijo al viewport: no depende de la altura de la página,
+   así no se estira ni se corta cuando hay muchas películas */
+.login-page::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
   background:
     radial-gradient(120% 90% at 100% 100%, rgba(27, 11, 46, 0.55), transparent 60%),
     linear-gradient(135deg, var(--violeta) 0%, var(--coral) 58%, var(--caléndula) 100%);
@@ -153,7 +164,7 @@ code {
 /* ---------- Formas decorativas (estética 2017) ---------- */
 
 .login-blob {
-  position: absolute;
+  position: fixed;
   border-radius: 50%;
   filter: blur(2px);
   pointer-events: none;
@@ -181,7 +192,7 @@ code {
 }
 
 .login-ring {
-  position: absolute;
+  position: fixed;
   width: clamp(8rem, 18vw, 14rem);
   aspect-ratio: 1;
   top: 12%;
@@ -391,7 +402,7 @@ code {
   gap: 0.6rem;
   padding: 1rem 1.5rem;
   font: inherit;
-  font-size: 1.2rem;
+  font-size: clamp(1rem, 3.6vw, 1.2rem);
   font-weight: 700;
   color: #fff;
   cursor: pointer;
@@ -706,8 +717,8 @@ a.login-boton {
 
 .gestion-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 10.5rem), 1fr));
+  gap: clamp(0.75rem, 3vw, 1.5rem);
 }
 
 .pelicula-card {
@@ -716,9 +727,8 @@ a.login-boton {
   overflow: hidden;
   border-radius: 24px;
   border: 2px solid rgba(240, 238, 233, 0.16);
-  background: rgba(27, 11, 46, 0.86);
-  -webkit-backdrop-filter: blur(18px);
-  backdrop-filter: blur(18px);
+  min-width: 0;
+  background: rgb(33, 14, 55); /* opaco: evita el costoso backdrop-filter por cada tarjeta */
   box-shadow: 0 24px 48px -24px rgba(27, 11, 46, 0.8);
   transition:
     transform 0.3s var(--resorte),
@@ -726,10 +736,12 @@ a.login-boton {
     box-shadow 0.25s ease;
 }
 
-.pelicula-card:hover {
-  transform: translateY(-6px);
-  border-color: var(--caléndula);
-  box-shadow: 0 30px 56px -20px rgba(255, 77, 109, 0.5);
+@media (hover: hover) {
+  .pelicula-card:hover {
+    transform: translateY(-6px);
+    border-color: var(--caléndula);
+    box-shadow: 0 30px 56px -20px rgba(255, 77, 109, 0.5);
+  }
 }
 
 .pelicula-card__img {
@@ -785,10 +797,10 @@ a.login-boton {
   position: fixed;
   inset: 0;
   z-index: 10;
-  display: grid;
-  place-items: center;
+  display: flex;
   padding: 1.25rem;
   overflow-y: auto;
+  overscroll-behavior: contain;
   background: rgba(27, 11, 46, 0.7);
   -webkit-backdrop-filter: blur(6px);
   backdrop-filter: blur(6px);
@@ -814,5 +826,134 @@ a.login-boton {
 
   .gestion-page .login-hero__texto {
     margin-inline: auto;
+  }
+}
+
+/* ================= RESPONSIVE MEJORADO (gestión de películas) ================= */
+
+/* Contenido de gestión centrado y con ancho máximo en pantallas grandes */
+.gestion-page > .gestion-cabecera,
+.gestion-page > .gestion-panel,
+.gestion-page > .gestion-lista {
+  width: 100%;
+  max-width: 80rem;
+  margin-inline: auto;
+}
+
+.gestion-page {
+  padding-bottom: max(clamp(1.25rem, 5vw, 4rem), env(safe-area-inset-bottom));
+}
+
+/* El modal se centra sin recortar su parte superior cuando es más alto que la pantalla */
+.gestion-overlay > .login-card {
+  margin: auto;
+  width: min(100%, 26rem);
+}
+
+/* Título y género: máximo 2 líneas para que todas las tarjetas queden parejas */
+.pelicula-card__titulo,
+.pelicula-card__genero {
+  overflow-wrap: anywhere;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+}
+
+.pelicula-card__cuerpo {
+  flex: 1;
+  align-content: start;
+}
+
+.pelicula-card__acciones {
+  margin-top: auto;
+  padding-top: 0.6rem;
+}
+
+/* Tablet y escritorio: tarjetas más grandes */
+@media (min-width: 900px) {
+  .gestion-grid {
+    grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+  }
+}
+
+/* Móvil */
+@media (max-width: 599px) {
+  .login-page.gestion-page {
+    gap: 1.25rem;
+  }
+
+  .gestion-page .login-hero__titulo {
+    font-size: clamp(2rem, 11vw, 2.75rem);
+  }
+
+  /* Cabecera: botones lado a lado, ocupando todo el ancho */
+  .gestion-acciones {
+    width: 100%;
+  }
+
+  .gestion-acciones > * {
+    flex: 1 1 0;
+  }
+
+  .gestion-campos {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.1rem;
+  }
+
+  .login-card__inner {
+    gap: 1.1rem;
+  }
+
+  .login-card__titulo {
+    font-size: 1.35rem;
+  }
+
+  /* Tarjetas compactas */
+  .pelicula-card {
+    border-radius: 18px;
+  }
+
+  .pelicula-card__cuerpo {
+    gap: 0.25rem;
+    padding: 0.8rem 0.8rem 0.9rem;
+  }
+
+  .pelicula-card__titulo {
+    font-size: 1rem;
+  }
+
+  .pelicula-card__genero {
+    font-size: 0.8rem;
+  }
+
+  .pelicula-card__acciones {
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .pelicula-card__acciones .login-boton {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
+  }
+
+  .gestion-overlay {
+    padding: 0.75rem;
+  }
+}
+
+/* Pantallas muy pequeñas: una sola columna */
+@media (max-width: 340px) {
+  .gestion-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Teléfono en horizontal: evita que el formulario de login quede cortado arriba/abajo */
+@media (max-height: 520px) and (orientation: landscape) {
+  .login-page {
+    align-content: start;
   }
 }
